@@ -1,0 +1,39 @@
+name: prometheus-apt-exporter
+version: '0.2.5'
+grade: stable
+summary: Export textfile-based apt-repositories metrics from parsed log data
+description: >
+    This project provides an textfile-based exporter for apt-repositories.
+confinement: classic
+license: GPL-3.0
+base: core20
+
+plugs:
+  apt-exporter-files:
+    interface: system-files
+    read:
+      - /var/lib/dpkg/status
+      - /usr/share/dpkg/cputable
+      - /usr/share/dpkg
+      - /etc/apt/apt.conf.d
+      - /etc/apt/sources.list 
+      - /etc/apt/sources.list.d 
+
+
+apps:
+  apt-exporter:
+    command: 'bin/pkg-exporter.sh'
+    environment:
+      PYTHONPATH: $SNAP/usr/lib/python3.8/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+parts:
+  pkg-exporter:
+    plugin: python
+    source: https://github.com/margau/pkg-exporter.git
+    source-tag: v${SNAPCRAFT_PROJECT_VERSION}
+    stage-packages:
+      - python3-apt
+  launcher:
+    plugin: dump
+    source: .
+    organize:
+      pkg-exporter.sh: bin/
