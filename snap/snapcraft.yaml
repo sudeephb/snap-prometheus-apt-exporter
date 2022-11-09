@@ -4,7 +4,7 @@ grade: stable
 summary: Export textfile-based apt-repositories metrics from parsed log data
 description: >
     This project provides an textfile-based exporter for apt-repositories.
-confinement: classic
+confinement: strict
 license: GPL-3.0
 base: core20
 
@@ -12,28 +12,37 @@ plugs:
   apt-exporter-files:
     interface: system-files
     read:
-      - /var/lib/dpkg/status
-      - /usr/share/dpkg/cputable
       - /usr/share/dpkg
       - /etc/apt/apt.conf.d
-      - /etc/apt/sources.list 
-      - /etc/apt/sources.list.d 
-
+      - /var/lib/snapd/hostfs/etc/apt
+      - /var/lib/snapd/hostfs/var/cache/apt
+      - /var/lib/snapd/hostfs/var/cache/apt/srcpkgcache.bin
+      - /var/lib/snapd/hostfs/var/lib/apt
+      - /var/lib/snapd/hostfs/var/lib/dpkg
+      - /var/lib/snapd/hostfs/var/lib/dpkg/status
+      - /var/lib/snapd/hostfs/usr/bin/dpkg
+      - /var/lib/snapd/hostfs/usr/share/dpkg/cputable
+      - /var/lib/snapd/hostfs/etc/apt/apt.conf.d
+      - /var/lib/snapd/hostfs/etc/apt/sources.list
+      - /var/lib/snapd/hostfs/etc/apt/sources.list.d
+    write:
+      - /var/lib/snapd/hostfs/var/cache/apt/srcpkgcache.bin
 
 apps:
   apt-exporter:
-    command: 'bin/pkg-exporter.sh'
+    command: 'bin/pkg-exporter --rootdir /var/lib/snapd/hostfs/ -a 0.0.0.0'
+    daemon: simple
     environment:
-      PYTHONPATH: $SNAP/usr/lib/python3.8/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+      PYTHONPATH: $SNAP/usr/lib/python3/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
+    plugs:
+      - apt-exporter-files
+      - network-bind
+
 parts:
   pkg-exporter:
     plugin: python
-    source: https://github.com/margau/pkg-exporter.git
-    source-tag: v${SNAPCRAFT_PROJECT_VERSION}
+    source: ./pkg-exporter
+    build-packages:
+      - git
     stage-packages:
       - python3-apt
-  launcher:
-    plugin: dump
-    source: .
-    organize:
-      pkg-exporter.sh: bin/
