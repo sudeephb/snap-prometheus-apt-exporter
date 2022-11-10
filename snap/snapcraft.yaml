@@ -30,7 +30,7 @@ plugs:
 
 apps:
   apt-exporter:
-    command: 'bin/pkg-exporter --rootdir /var/lib/snapd/hostfs/ -a 0.0.0.0'
+    command: 'bin/pkg-exporter --rootdir /var/lib/snapd/hostfs/ -d'
     daemon: simple
     environment:
       PYTHONPATH: $SNAP/usr/lib/python3/site-packages:$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
