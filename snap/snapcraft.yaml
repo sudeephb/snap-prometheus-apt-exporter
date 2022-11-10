@@ -26,7 +26,7 @@ plugs:
       - /var/lib/snapd/hostfs/etc/apt/sources.list
       - /var/lib/snapd/hostfs/etc/apt/sources.list.d
     write:
-      - /var/lib/snapd/hostfs/var/cache/apt/srcpkgcache.bin
+      - /var/lib/snapd/hostfs/var/cache/apt
 
 apps:
   apt-exporter:
@@ -41,8 +41,6 @@ apps:
 parts:
   pkg-exporter:
     plugin: python
-    source: ./pkg-exporter
-    build-packages:
-      - git
+    source: https://github.com/helgharbi/pkg-exporter.git
     stage-packages:
       - python3-apt
