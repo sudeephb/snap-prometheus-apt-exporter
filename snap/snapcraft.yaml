@@ -7,6 +7,8 @@ description: >
 confinement: strict
 license: GPL-3.0
 base: core20
+architectures:
+  - build-on: amd64
 
 layout:
   /etc/apt:
